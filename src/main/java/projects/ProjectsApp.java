@@ -4,7 +4,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Scanner;
 
-import projects.dao.DbConnection;
+//import projects.dao.DbConnection;
 import projects.exception.DbException;
 import projects.service.ProjectService;
 import projects.entity.*;
@@ -12,14 +12,17 @@ import projects.entity.*;
 
 public class ProjectsApp {
 	// @formatter:off
-	private List<String> operations = List.of("1) Add a project");
+	private List<String> operations = List.of("1) Add a project"
+			, "2) List projects"
+			, "3) Select a project");
 	// @formatter:on
 	private Scanner scanner = new Scanner(System.in);
 	private ProjectService projectService = new ProjectService();
-	
+	// Instance variable for currently selected project:
+	private Project currProject;
 	
 	public static void main(String[] args) {
-		// TODO Auto-generated method stub
+		// Create a new instance of the user menu:
 		new ProjectsApp().processUserSelections();
 		
 	}
@@ -36,6 +39,12 @@ public class ProjectsApp {
 					case 1:	
 						createProject();
 						break;
+					case 2:	
+						listProjects();
+						break;
+					case 3:
+						selectProject();
+						break;
 					default:
 						System.out.println("\n" + selection + " is not a valid selection. Try again.");
 						break;
@@ -47,11 +56,6 @@ public class ProjectsApp {
 		}
 	}
 
-	private boolean exitMenu() {
-		System.out.println("Exiting menu.");
-		return true;
-	}
-
 	private int getUserSelection() {
 		printOperations();
 		
@@ -61,7 +65,6 @@ public class ProjectsApp {
 	}
 
 	private void printOperations() {
-		// TODO Auto-generated method stub
 		System.out.println("\nThese are the available selections. Press the Enter key to quit:");
 		for(String s: operations) {
 			// Print out current item in operations, indented with a tab:
@@ -69,6 +72,7 @@ public class ProjectsApp {
 		}
 	}
 	
+	// Have a user create a new project and add it to the database:
 	private void createProject() {
 		String projectName = getStringInput("Enter the project name");
 		BigDecimal estimatedHours = getDecimalInput("Enter the estimated hours");
@@ -95,9 +99,41 @@ public class ProjectsApp {
 		Project dbProject = projectService.addProject(project);
 		System.out.println("You have successfully created project: "+dbProject);
 		
-		
 	}
 	
+	
+	private void listProjects() {
+		// Retrieve all projects in the database as a list of Project items:
+		List<Project> projects = projectService.fetchAllProjects();
+		// Print contents of projects to console:
+		System.out.println("\nProjects");
+		projects.forEach(project -> System.out.println(
+				"	" + project.getProjectId()
+				+ ": "+ project.getProjectName()));
+	}
+	
+	// Allow a user to "select" a project in the database where they can add materials, categories, or steps:
+	private void selectProject() {
+		// Obtain list of existent projects by calling listProjects:
+		listProjects();
+		// Obtain a valid projectId from user:
+		Integer projectId = getIntInput("Enter a project ID to select a project: ");
+		// Set currProject to null to un-select current project to avoid potential errors:
+		currProject=null;
+		// Set currProject to project in database with entered ID. An exception will be thrown if an invalid ID is entered:
+		currProject = projectService.fetchProjectById(projectId);
+		
+		if(Objects.isNull(currProject)) {
+			System.out.println("\nYou are not working on a project.");
+		}else {
+			System.out.println("\nYou are working with project: " + currProject);
+		}
+	}
+	
+	private boolean exitMenu() {
+		System.out.println("Exiting menu.");
+		return true;
+	}
 	
 	private BigDecimal getDecimalInput(String prompt) {
 		// Obtain String input from user:
