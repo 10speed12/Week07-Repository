@@ -223,7 +223,7 @@ public class ProjectDAO extends DaoBase{
 				+ "notes = ? "
 				+ "WHERE project_id = ?";
 		// @formatter:on
-		System.out.println(sql);
+		// System.out.println(sql);
 		try(Connection conn = DbConnection.getConnection()){
 			// Start the new transaction:
 			startTransaction(conn);
@@ -240,9 +240,9 @@ public class ProjectDAO extends DaoBase{
 				setParameter(stmt, 5, project.getNotes(), String.class);
 				// Set the sixth ? placeholder in the SQL statement to projectId from project:
 				setParameter(stmt, 6, project.getProjectId(), Integer.class);
-				System.out.println(project);
+				// System.out.println(project);
 				// Confirm results of update:
-				boolean modified = stmt.executeUpdate(sql) == 1;
+				boolean modified = stmt.executeUpdate() == 1;
 				// Commit results of update to the database:
 				commitTransaction(conn);
 				// Return whether or not the update was successful:
@@ -252,6 +252,31 @@ public class ProjectDAO extends DaoBase{
 				throw new DbException(e);
 			}
 		}catch (SQLException e) {
+			throw new DbException(e);
+		}
+	}
+
+	public boolean deleteProject(Integer projectId) {
+		// TODO Auto-generated method stub
+		String sql = "DELETE FROM " + PROJECT_TABLE +" WHERE project_id = ?";
+		try(Connection conn = DbConnection.getConnection()){
+			// Start a new transaction if the connection succeeded:
+			startTransaction(conn);
+			// Attempt to prepare a statement with the SQL query:
+			try(PreparedStatement stmt = conn.prepareStatement(sql)){
+				// Replace wildcard placeholder in statement with projectId:
+				setParameter(stmt,1,projectId,Integer.class);
+				// Execute statement with executeUpdate and confirm that returned value is 1:
+				boolean deleted = stmt.executeUpdate() == 1;
+				// Commit results of transaction to database:
+				commitTransaction(conn);
+				return deleted;
+			}catch(Exception e) {
+				rollbackTransaction(conn);
+				throw new DbException(e);
+			}
+			
+		}catch(SQLException e) {
 			throw new DbException(e);
 		}
 	}

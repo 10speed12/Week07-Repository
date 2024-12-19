@@ -29,5 +29,12 @@ public class ProjectService {
 		
 		}
 	}
+	public void deleteProject(Integer projectId) {
+		// Confirm that DELETE was performed successfully:
+		if(!projectDao.deleteProject(projectId)) {
+			throw new DbException("Project with ID="
+					+ projectId + " does not exist.");
+		}
+	}
 
 }

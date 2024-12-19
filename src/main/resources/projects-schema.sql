@@ -47,3 +47,31 @@ CREATE TABLE project_category(
 	UNIQUE(project_id),
 	UNIQUE(category_id)
 );
+
+--Add Test Values
+
+insert into project (project_name,estimated_hours , actual_hours, difficulty, notes) values 
+('Hang a door', 4.3, 3.65, 3, 'Use the door hangers from Home Depot');
+
+insert into material (project_id, material_name, num_required, cost) 
+values (1, "Door in frame", 1, 75.99);
+
+insert into material (project_id, material_name, num_required, cost) 
+values (1, "2-inch screws", 20, 1.09);
+
+insert into material (project_id, material_name, num_required, cost) 
+values (1, "Door Hangers", 2, 45.99);
+
+insert into step (project_id,step_text, step_order)
+values (1, 'Align hangers on opening side of door.', 1);
+
+insert into step (project_id, step_text, step_order)
+values (1, 'Screw hangers into frame', 2);
+
+insert into category (category_id, category_name) values (1, 'Doors and Windows');
+insert into category (category_id, category_name) values (2, 'Repairs');
+insert into category (category_id, category_name) values (3, 'Gardening');
+
+insert into project_category (project_id, category_id) values (1,1);
+insert into project_category (project_id, category_id) values (1,2);
+

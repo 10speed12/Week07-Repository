@@ -15,7 +15,8 @@ public class ProjectsApp {
 	private List<String> operations = List.of("1) Add a project"
 			, "2) List projects"
 			, "3) Select a project"
-			, "4) Update project details");
+			, "4) Update project details"
+			, "5) Delete a project");
 	// @formatter:on
 	private Scanner scanner = new Scanner(System.in);
 	private ProjectService projectService = new ProjectService();
@@ -48,6 +49,9 @@ public class ProjectsApp {
 						break;
 					case 4:	
 						updateProjectDetails();
+						break;
+					case 5:
+						deleteProject();
 						break;
 					default:
 						System.out.println("\n" + selection + " is not a valid selection. Try again.");
@@ -175,6 +179,21 @@ public class ProjectsApp {
 			// Reread the current project to reflect changes made:
 			currProject= projectService.fetchProjectById(currProject.getProjectId());
 		
+	}
+	
+	private void deleteProject() {
+		// Call listProjects to show valid options for deletion:
+		listProjects();
+		//Obtain id of project to be deleted:
+		Integer deleteId = getIntInput("Enter ID of project to be deleted: ");
+		// Call delete project function in projectService:
+		projectService.deleteProject(deleteId);
+		// Print success message to user:
+		System.out.println("Project " + deleteId + " was deleted successfully.");
+		// If currProject is not null, and it's projectId value matches the deleted id, set currProject to null:
+		if(Objects.nonNull(currProject) && currProject.getProjectId().equals(deleteId)) {
+			currProject=null;
+		}
 	}
 	
 	private boolean exitMenu() {
