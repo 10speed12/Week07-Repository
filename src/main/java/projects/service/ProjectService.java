@@ -5,6 +5,7 @@ import java.util.NoSuchElementException;
 
 import projects.dao.ProjectDAO;
 import projects.entity.Project;
+import projects.exception.DbException;
 
 public class ProjectService {
 	private ProjectDAO projectDao = new ProjectDAO();
@@ -19,6 +20,14 @@ public class ProjectService {
 				() -> new NoSuchElementException(
 					"Project with project ID=" + projectId	
 					+" does not exist."));
+	}
+	public void modifyProjectDetails(Project project) {
+		// Confirm that UPDATE for database was performed successfully:
+		if(!projectDao.modifyProjectDetails(project)) {
+			throw new DbException("Project with ID="
+					+ project.getProjectId() + " does not exist.");
+		
+		}
 	}
 
 }

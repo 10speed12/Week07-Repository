@@ -211,4 +211,48 @@ public class ProjectDAO extends DaoBase{
 			}
 		}
 	}
+
+	public boolean modifyProjectDetails(Project project) {
+		// @formatter:off
+		String sql = ""
+				+ "UPDATE " + PROJECT_TABLE + " SET "
+				+ "project_name = ?, "
+				+ "estimated_hours = ?, "
+				+ "actual_hours = ?, "
+				+ "difficulty = ?, "
+				+ "notes = ? "
+				+ "WHERE project_id = ?";
+		// @formatter:on
+		System.out.println(sql);
+		try(Connection conn = DbConnection.getConnection()){
+			// Start the new transaction:
+			startTransaction(conn);
+			try(PreparedStatement stmt = conn.prepareStatement(sql)){
+				// Set the first ? placeholder in the SQL statement to projectName from project:
+				setParameter(stmt, 1, project.getProjectName(), String.class);
+				// Set the second ? placeholder in the SQL statement to estimatedHours from project:
+				setParameter(stmt, 2, project.getEstimatedHours(), BigDecimal.class);
+				// Set the third ? placeholder in the SQL statement to actualHours from project:
+				setParameter(stmt, 3, project.getActualHours(), BigDecimal.class);
+				// Set the fourth ? placeholder in the SQL statement to difficulty from project:
+				setParameter(stmt, 4, project.getDifficulty(), Integer.class);
+				// Set the fifth ? placeholder in the SQL statement to notes from project:
+				setParameter(stmt, 5, project.getNotes(), String.class);
+				// Set the sixth ? placeholder in the SQL statement to projectId from project:
+				setParameter(stmt, 6, project.getProjectId(), Integer.class);
+				System.out.println(project);
+				// Confirm results of update:
+				boolean modified = stmt.executeUpdate(sql) == 1;
+				// Commit results of update to the database:
+				commitTransaction(conn);
+				// Return whether or not the update was successful:
+				return modified;
+			}catch(Exception e) {
+				rollbackTransaction(conn);
+				throw new DbException(e);
+			}
+		}catch (SQLException e) {
+			throw new DbException(e);
+		}
+	}
 }

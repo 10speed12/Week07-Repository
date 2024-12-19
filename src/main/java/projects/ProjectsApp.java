@@ -14,7 +14,8 @@ public class ProjectsApp {
 	// @formatter:off
 	private List<String> operations = List.of("1) Add a project"
 			, "2) List projects"
-			, "3) Select a project");
+			, "3) Select a project"
+			, "4) Update project details");
 	// @formatter:on
 	private Scanner scanner = new Scanner(System.in);
 	private ProjectService projectService = new ProjectService();
@@ -44,6 +45,9 @@ public class ProjectsApp {
 						break;
 					case 3:
 						selectProject();
+						break;
+					case 4:	
+						updateProjectDetails();
 						break;
 					default:
 						System.out.println("\n" + selection + " is not a valid selection. Try again.");
@@ -101,7 +105,6 @@ public class ProjectsApp {
 		
 	}
 	
-	
 	private void listProjects() {
 		// Retrieve all projects in the database as a list of Project items:
 		List<Project> projects = projectService.fetchAllProjects();
@@ -128,6 +131,50 @@ public class ProjectsApp {
 		}else {
 			System.out.println("\nYou are working with project: " + currProject);
 		}
+	}
+	
+	private void updateProjectDetails() {
+		// Confirm that a project is currently being worked on:
+		if(Objects.isNull(currProject)) {
+			// Print error message if currProject is null:
+			System.out.println("\nPlease select a project");
+			return;
+		}
+			// Get new project name:
+			String projectName = getStringInput("Enter the project name ["
+					+ currProject.getProjectName() + "]");
+			// Get new estimated hours:
+			BigDecimal estimatedHours = getDecimalInput("Enter the estimated hours ["
+					+ currProject.getEstimatedHours() + "]");
+			// Get new actual hours:
+			BigDecimal actualHours = getDecimalInput("Enter the actual hours ["
+					+ currProject.getActualHours() + "]");
+			// Get new project difficulty:
+			Integer difficulty = getIntInput("Enter the project difficulty (1-5) ["
+					+currProject.getDifficulty() + "]");
+			// Get new notes:
+			String notes = getStringInput("Enter the project notes ["
+					+ currProject.getNotes() + "]");
+			// Create new Project to store results:
+			Project project = new Project();
+			// Set new projectId to currProject's project id value:
+			project.setProjectId(currProject.getProjectId());
+			// Set new project name value to updated form if projectName is not null, otherwise, leave as is:
+			project.setProjectName(Objects.isNull(projectName) ? currProject.getProjectName() : projectName);
+			// Set new estimated hours to updated form if estimatedHours is not null, otherwise, leave as is:
+			project.setEstimatedHours(Objects.isNull(estimatedHours) ? currProject.getEstimatedHours() : estimatedHours);
+			// Set new actual hours to updated form if actualHours is not null, otherwise, leave as is:
+			project.setActualHours(Objects.isNull(actualHours) ? currProject.getActualHours() : actualHours);
+			// Set new difficulty value to updated form if difficulty is not null, otherwise, leave as is:
+			project.setDifficulty(Objects.isNull(difficulty) ? currProject.getDifficulty() : difficulty);
+			// Set new notes value to updated form if notes is not null, otherwise, leave as is:
+			project.setNotes(Objects.isNull(notes) ? currProject.getNotes() : notes);
+			
+			// Call projectService's modifyProjectDetails function to update database with the new information:
+			projectService.modifyProjectDetails(project);
+			// Reread the current project to reflect changes made:
+			currProject= projectService.fetchProjectById(currProject.getProjectId());
+		
 	}
 	
 	private boolean exitMenu() {
